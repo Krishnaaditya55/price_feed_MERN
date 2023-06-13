@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import axios from "axios";
 import { loadData, uploadFile, updateRecord } from "./service";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -36,7 +35,7 @@ function App() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (file) {
-      const data = await uploadFile(file);
+      await uploadFile(file);
       alert("File uploaded successfully");
       setPage(1);
       getUserList();
@@ -46,7 +45,7 @@ function App() {
 
   const handleEdtFormSubmit = async (e) => {
     e.preventDefault();
-    const data = await updateRecord(givenValue);
+    await updateRecord(givenValue);
     alert("Record updated successfully");
     getUserList();
     handleEditClose();
@@ -58,10 +57,6 @@ function App() {
 
   const columns = [
     {
-      name: "S No",
-      selector: "id",
-    },
-    {
       name: "Store ID",
       selector: "StoreID",
     },
@@ -69,7 +64,6 @@ function App() {
       name: "SKU",
       selector: "SKU",
     },
-
     {
       name: "Product Name",
       selector: "ProductName",
@@ -78,7 +72,6 @@ function App() {
       name: "Price",
       selector: "Price",
     },
-
     {
       name: "Action",
       cell: (row) => (
@@ -90,29 +83,24 @@ function App() {
   ];
 
   return (
-    <div className="App">
-      <Button variant="primary float-right float-end" onClick={handleShow}>
-        Upload Csv
-      </Button>
-
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Please Upload Store Product File as CSV</Modal.Title>
-        </Modal.Header>
-        <form onSubmit={handleFormSubmit}>
-          <Modal.Body>
-            <input type="file" onChange={handleFileUpload} name="uploadcsv" />
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" type="button" onClick={handleClose}>
-              Close
-            </Button>
+    <div className="container mt-3">
+      <form onSubmit={handleFormSubmit}>
+        <div className="row">
+          <div className="col-10">
+            <input
+              type="file"
+              className="form-control"
+              onChange={handleFileUpload}
+              name="uploadcsv"
+            />
+          </div>
+          <div className="col-2">
             <Button variant="primary" type="submit">
-              Save Changes
+              Upload
             </Button>
-          </Modal.Footer>
-        </form>
-      </Modal>
+          </div>
+        </div>
+      </form>
 
       <Modal show={editShow} onHide={handleEditClose}>
         <Modal.Header closeButton>
@@ -188,27 +176,29 @@ function App() {
               Close
             </Button>
             <Button variant="primary" type="submit">
-              Save Changes
+              Update
             </Button>
           </Modal.Footer>
         </form>
       </Modal>
 
-      <DataTable
-        title="Products"
-        columns={columns}
-        data={users.data}
-        highlightOnHover
-        pagination
-        paginationServer
-        paginationTotalRows={users.count}
-        paginationRowsPerPageOptions={[5, 15, 25, 50]}
-        paginationPerPage={countPerPage}
-        paginationComponentOptions={{
-          noRowsPerPage: true,
-        }}
-        onChangePage={setPage}
-      />
+      {users.data && (
+        <DataTable
+          title="Products"
+          columns={columns}
+          data={users.data}
+          highlightOnHover
+          pagination
+          paginationServer
+          paginationTotalRows={users.count}
+          paginationRowsPerPageOptions={[5, 15, 25, 50]}
+          paginationPerPage={countPerPage}
+          paginationComponentOptions={{
+            noRowsPerPage: true,
+          }}
+          onChangePage={setPage}
+        />
+      )}
     </div>
   );
 }
